@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'angapp',
     'rest_framework',
+    'bootstrap5',
+    'crispy_forms',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',

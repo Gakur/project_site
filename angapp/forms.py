@@ -24,9 +24,9 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['__all__']
+        fields = ['profile_photo', 'user', 'bio', 'contact']
 
 class RatingsForm(forms.ModelForm):
     class Meta:
         model = Rating
-        fields = ['__all__']               
+        fields = ['design', 'usability', 'content']               

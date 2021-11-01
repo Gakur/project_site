@@ -1,11 +1,25 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
+from django.conf.urls.static import static
+from django.conf import settings
+from rest_framework import generics, routers
+
+# router = routers.DefaultRouter()
+# router.register('projects', views.Project_objects)
+# router.register('profile', views.Profile_objects)
 
 urlpatterns = [
-    path('angapp/projects', views.Project_objects.as_view()),
-    path('angapp/<int:pk>/', views.Project_details.as_view()),
-    path('angapp/profile', views.Profile_objects.as_view),
-    path('api/<int:pk>/', views.Profile_details.as_view)
+    path('', views.index, name='index'),
+    # path('api/', include(router.urls)),
+    path('api/projects/',views.Project_objects.as_view()),
+    path('api/projects/',views.Profile_objects.as_view()),
+    path('<username>/profile', views.user_profile, name='userprofile'),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('profile/<username>/', views.profile, name='profile'),
+    path('profile/<username>/settings', views.edit_profile, name='edit'),
+    path('projects/<post>', views.project, name='project'),
+    path('search/', views.search_project, name='search'),
 ]
-urlpatterns = format_suffix_patterns(urlpatterns)
+if settings.DEBUG:
+    urlpatterns+=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

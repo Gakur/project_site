@@ -14,21 +14,21 @@ def index(request):
     if request.method == "POST":
         form = ProjectsForm(request.POST)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user
-            post.save()
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
     else:
         form = ProjectsForm()
 
     try:
-        posts = Projects.objects.all()
-        posts = posts[::-1]
-        a_post = random.randint(0, len(posts)-1)
-        random_post = posts[a_post]
-        print(random_post.photo)
+        project = Projects.objects.all()
+        project = project[::-1]
+        a_project = random.randint(0, len(project)-1)
+        random_project = project[a_project]
+        print(random_project.project_photo)
     except Projects.DoesNotExist:
-        posts = None
-    return render(request, 'index.html', {'posts': posts, 'form': form, 'random_post': random_post})
+        project = None
+    return render(request, 'index.html', {'posts': project, 'form': form, 'random_post': random_project})
 
 
 
@@ -50,7 +50,7 @@ class Profile_details(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-@login_required(login_url='login')
+@login_required(login_url='/accounts/login/')
 def profile(request, username):
     return render(request, 'profile.html')
 
@@ -62,10 +62,10 @@ def user_profile(request, username):
     params = {
         'user_prof': user_prof,
     }
-    return render(request, 'userprofile.html', params)
+    return render(request, 'user_profile.html', params)
 
 
-@login_required(login_url='login')
+@login_required(login_url='/accounts/login/')
 def edit_profile(request, username):
     user = User.objects.get(username=username)
     if request.method == 'POST':
@@ -82,10 +82,10 @@ def edit_profile(request, username):
         'user_form': user_form,
         'prof_form': prof_form
     }
-    return render(request, 'edit.html', params)
+    return render(request, 'change_profile.html', params)
 
 
-@login_required(login_url='login')
+@login_required(login_url='/accounts/login/')
 def project(request, post):
     post = Projects.objects.get(title=post)
     ratings = Rating.objects.filter(user=request.user, post=post).first()
@@ -128,7 +128,7 @@ def project(request, post):
         'rating_status': rating_status
 
     }
-    return render(request, 'project.html', params)
+    return render(request, 'projects.html', params)
 
 
 def search_project(request):
@@ -141,7 +141,7 @@ def search_project(request):
             'results': results,
             'message': message
         }
-        return render(request, 'results.html', params)
+        return render(request, 'search.html', params)
     else:
         message = "You haven't searched for any project"
-    return render(request, 'results.html', {'message': message})
+    return render(request, 'search.html', {'message': message})

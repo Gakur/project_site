@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth import views
 
 import angapp
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('angapp.urls'))
+    path('', include('angapp.urls')),
+    path('accounts/', include('django_registration.backends.one_step.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('logout',views.logout_then_login, {"login_url": '/'}),
 ]
