@@ -4,11 +4,34 @@ from .models import Projects, Profile, Rating
 from .serializers import ProfileSerializer, ProjectSerializer, RatingSerializer
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
-from .forms import UserForm, ProfileForm, RatingsForm
+import random
+from .forms import ProjectsForm, UserForm, ProfileForm, RatingsForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
+def index(request):
+    if request.method == "POST":
+        form = ProjectsForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+    else:
+        form = ProjectsForm()
+
+    try:
+        posts = Projects.objects.all()
+        posts = posts[::-1]
+        a_post = random.randint(0, len(posts)-1)
+        random_post = posts[a_post]
+        print(random_post.photo)
+    except Projects.DoesNotExist:
+        posts = None
+    return render(request, 'index.html', {'posts': posts, 'form': form, 'random_post': random_post})
+
+
+
 
 class Project_objects(generics.ListCreateAPIView):
     queryset = Projects.objects.all()
