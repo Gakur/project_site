@@ -2,6 +2,10 @@ from django.shortcuts import render
 from rest_framework import generics, serializers
 from .models import Projects, Profile, Rating
 from .serializers import ProfileSerializer, ProjectSerializer, RatingSerializer
+from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 
@@ -59,7 +63,7 @@ def edit_profile(request, username):
 
 @login_required(login_url='login')
 def project(request, post):
-    post = Post.objects.get(title=post)
+    post = Projects.objects.get(title=post)
     ratings = Rating.objects.filter(user=request.user, post=post).first()
     rating_status = None
     if ratings is None:
@@ -106,7 +110,7 @@ def project(request, post):
 def search_project(request):
     if request.method == 'GET':
         title = request.GET.get("title")
-        results = Post.objects.filter(title__icontains=title).all()
+        results = Projects.objects.filter(title__icontains=title).all()
         print(results)
         message = f'name'
         params = {
@@ -115,5 +119,5 @@ def search_project(request):
         }
         return render(request, 'results.html', params)
     else:
-        message = "You haven't searched for any image category"
+        message = "You haven't searched for any project"
     return render(request, 'results.html', {'message': message})
