@@ -2,38 +2,28 @@ from django.shortcuts import render
 from rest_framework import generics, serializers
 from .models import Projects, Profile, Rating
 from .serializers import ProfileSerializer, ProjectSerializer, RatingSerializer
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 import random
+from rest_framework import viewsets
+
 from .forms import ProjectsForm, UserForm, ProfileForm, RatingsForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 def index(request):
-    if request.method == "POST":
-        form = ProjectsForm(request.POST)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.user = request.user
-            project.save()
-    else:
-        form = ProjectsForm()
 
     try:
-        project = Projects.objects.all()
-        project = project[::-1]
-        a_project = random.randint(0, len(project)-1)
-        random_project = project[a_project]
-        print(random_project.project_photo)
-    except Projects.DoesNotExist:
-        project = None
-    return render(request, 'index.html', {'posts': project, 'form': form, 'random_post': random_project})
+        projects=Projects.objects.all()
+    except Exception as e:
+        raise  Http404()
+    return render(request,'index.html',{"projects":projects})
 
 
 
 
-class Project_objects(generics.ListCreateAPIView):
+class Project_objects(viewsets.ModelViewSet):
     queryset = Projects.objects.all()
     serializer_class = ProjectSerializer
 
@@ -42,7 +32,7 @@ class Project_details(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProjectSerializer 
 
 
-class Profile_objects(generics.ListCreateAPIView):
+class Profile_objects(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
@@ -87,7 +77,7 @@ def edit_profile(request, username):
 
 @login_required(login_url='/accounts/login/')
 def project(request, post):
-    post = Projects.objects.get(title=post)
+    post = Projects.objects.get(project_name=post)
     ratings = Rating.objects.filter(user=request.user, post=post).first()
     rating_status = None
     if ratings is None:
@@ -133,8 +123,8 @@ def project(request, post):
 
 def search_project(request):
     if request.method == 'GET':
-        title = request.GET.get("title")
-        results = Projects.objects.filter(title__icontains=title).all()
+        project_id = request.GET.get("project_name")
+        results = Projects.objects.filter(project_id).all()
         print(results)
         message = f'name'
         params = {
