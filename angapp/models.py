@@ -6,25 +6,16 @@ from datetime import date
 
 # Create your models here.
 class Profile(models.Model):
-    profile_photo = models.ImageField(upload_to='profile/')
+    profile_photo = models.ImageField(upload_to='profile/', default='default.jpeg')
     bio = models.TextField(blank=True)
-    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='profile', null=True, on_delete=models.CASCADE)
     contact =   models.CharField(max_length=10, blank=True)
-
-    def __str__(self):
-        return self.bio
 
     def save_user(self):
         self.save()
 
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user_id=instance)
-
-    @receiver(post_save, sender=User)
-    def save_profile(sender, instance, **kwargs):
-        instance.profile.save()
+    def __str__(self):
+        return self.bio
 
 
 class Projects(models.Model):
